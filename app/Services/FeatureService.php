@@ -7,13 +7,17 @@
 
 namespace App\Services;
 use App\Repositories\FeatureRepository;
+use App\Repositories\PackageRepository;
+use Exception;
 
 class FeatureService {
     private $repo;
+    private $package;
 
-    public function __construct(FeatureRepository $FeatureRepository)
+    public function __construct(FeatureRepository $FeatureRepository, PackageRepository $PackageRepository)
     {
         $this->repo = $FeatureRepository;
+        $this->package = $PackageRepository;
     }
 
     /**
@@ -106,6 +110,11 @@ class FeatureService {
     public function delete(string|int $id)
     {
         try {
+            // validate package relation
+            if ($this->repo->checkPackageFeature(decodeID($id))) {
+                throw new Exception(__('features.cannot_delete_relation'));
+            }
+
             return [
                 'data' => $this->repo->delete(decodeID($id)),
                 'message' => __('features.success_delete_feature'),

@@ -2,17 +2,20 @@
 
 namespace App\Repositories;
 use App\Models\Feature;
+use App\Models\PackageFeature;
 
 class FeatureRepository {
     const PRIMARY_KEY = 'id';
 
     private $Feature;
     private $perPage;
+    private $PackageFeature;
 
-    public function __construct(Feature $Feature)
+    public function __construct(Feature $Feature, PackageFeature $PackageFeature)
     {
         $this->Feature = $Feature;
         $this->perPage = 10;
+        $this->PackageFeature = $PackageFeature;
     }
 
     /**
@@ -33,6 +36,16 @@ class FeatureRepository {
         }
 
         return $query->paginate($this->perPage);
+    }
+
+    /**
+     * Function to check feature relations
+     * @param string|int $featureId
+     */
+    public function checkPackageFeature(string|int $featureId)
+    {
+        return $this->PackageFeature->where('feature_id', $featureId)
+            ->first();
     }
 
     /**
